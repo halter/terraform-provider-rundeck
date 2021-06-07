@@ -182,7 +182,31 @@ func TestAccJobOptions_file(t *testing.T) {
 					testAccJobCheckExists("rundeck_job.test", &job),
 					func(s *terraform.State) error {
 						if job.OptionsConfig.Options[0].Type != "file" {
-							return fmt.Errorf("failed to set optin as type file; got %v", job.OptionsConfig.Options[0].Type)
+							return fmt.Errorf("failed to set option as type file; got %v", job.OptionsConfig.Options[0].Type)
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccJobOptions_hidden(t *testing.T) {
+	var job JobDetail
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccJobCheckDestroy(&job),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccJobOptions_hidden,
+				Check: resource.ComposeTestCheckFunc(
+					testAccJobCheckExists("rundeck_job.test", &job),
+					func(s *terraform.State) error {
+						if job.OptionsConfig.Options[0].IsHidden != "true" {
+							return fmt.Errorf("failed to set option as hidden; got %v", job.OptionsConfig.Options)
 						}
 						return nil
 					},
@@ -459,6 +483,36 @@ resource "rundeck_job" "test" {
   option {
     name = "foo"
     type = "file"
+  }
+  command {
+    description = "Prints Hello World"
+    shell_command = "echo Hello World"
+  }
+}
+`
+
+const testAccJobOptions_hidden = `
+resource "rundeck_project" "test" {
+  name = "terraform-acc-test-job-option-choices-empty"
+  description = "parent project for job acceptance tests"
+
+  resource_model_source {
+    type = "file"
+    config = {
+        format = "resourcexml"
+        file = "/tmp/terraform-acc-tests.xml"
+    }
+  }
+}
+resource "rundeck_job" "test" {
+  project_name = "${rundeck_project.test.name}"
+  name = "basic-job"
+  description = "A basic job with file option"
+
+  option {
+    name = "foo"
+    default_value = "bar"
+    hidden = true
   }
   command {
     description = "Prints Hello World"
