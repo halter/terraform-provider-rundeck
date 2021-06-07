@@ -526,3 +526,33 @@ resource "rundeck_job" "test" {
   }
 }
 `
+
+const testAccJobOptions_hidden = `
+resource "rundeck_project" "test" {
+  name = "terraform-acc-test-job-option-choices-empty"
+  description = "parent project for job acceptance tests"
+
+  resource_model_source {
+    type = "file"
+    config = {
+        format = "resourcexml"
+        file = "/tmp/terraform-acc-tests.xml"
+    }
+  }
+}
+resource "rundeck_job" "test" {
+  project_name = "${rundeck_project.test.name}"
+  name = "basic-job"
+  description = "A basic job with file option"
+
+  option {
+    name = "foo"
+    default_value = "bar"
+    hidden = true
+  }
+  command {
+    description = "Prints Hello World"
+    shell_command = "echo Hello World"
+  }
+}
+`

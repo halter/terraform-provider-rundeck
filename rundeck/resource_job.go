@@ -279,6 +279,12 @@ func resourceRundeckJob() *schema.Resource {
 							Optional: true,
 							Default:  false,
 						},
+
+						"hidden": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
 					},
 				},
 			},
