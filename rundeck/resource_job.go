@@ -3,6 +3,7 @@ package rundeck
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -270,6 +271,12 @@ func resourceRundeckJob() *schema.Resource {
 						"exposed_to_scripts": {
 							Type:     schema.TypeBool,
 							Optional: true,
+						},
+
+						"hidden": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
 						},
 					},
 				},
@@ -674,6 +681,10 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 				ObscureInput:            optionMap["obscure_input"].(bool),
 				ValueIsExposedToScripts: optionMap["exposed_to_scripts"].(bool),
 			}
+			hidden := optionMap["hidden"].(bool)
+			if hidden {
+				option.IsHidden = strconv.FormatBool(hidden)
+			}
 
 			for _, iv := range optionMap["value_choices"].([]interface{}) {
 				if iv == nil {
@@ -898,6 +909,15 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 				"multi_value_delimiter":     option.MultiValueDelimiter,
 				"obscure_input":             option.ObscureInput,
 				"exposed_to_scripts":        option.ValueIsExposedToScripts,
+			}
+			if option.IsHidden != "" {
+				hidden, err := strconv.ParseBool(option.IsHidden)
+				if err != nil {
+					return err
+				}
+				if hidden {
+					optionConfigI["hidden"] = hidden
+				}
 			}
 			optionConfigsI = append(optionConfigsI, optionConfigI)
 		}
