@@ -168,6 +168,30 @@ func TestAccJobOptions_empty_choice(t *testing.T) {
 	})
 }
 
+func TestAccJobOptions_file(t *testing.T) {
+	var job JobDetail
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccJobCheckDestroy(&job),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccJobOptions_file,
+				Check: resource.ComposeTestCheckFunc(
+					testAccJobCheckExists("rundeck_job.test", &job),
+					func(s *terraform.State) error {
+						if job.OptionsConfig.Options[0].Type != "file" {
+							return fmt.Errorf("failed to set optin as type file; got %v", job.OptionsConfig.Options[0].Type)
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 const testAccJobConfig_basic = `
 resource "rundeck_project" "test" {
   name = "terraform-acc-test-job"
@@ -407,6 +431,35 @@ resource "rundeck_job" "test" {
     name = "foo"
 	default_value = "bar"
 	value_choices = ["", "foo"]
+  }
+  command {
+    description = "Prints Hello World"
+    shell_command = "echo Hello World"
+  }
+}
+`
+
+const testAccJobOptions_file = `
+resource "rundeck_project" "test" {
+  name = "terraform-acc-test-job-option-choices-empty"
+  description = "parent project for job acceptance tests"
+
+  resource_model_source {
+    type = "file"
+    config = {
+        format = "resourcexml"
+        file = "/tmp/terraform-acc-tests.xml"
+    }
+  }
+}
+resource "rundeck_job" "test" {
+  project_name = "${rundeck_project.test.name}"
+  name = "basic-job"
+  description = "A basic job with file option"
+
+  option {
+    name = "foo"
+    type = "file"
   }
   command {
     description = "Prints Hello World"
