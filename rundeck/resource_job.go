@@ -209,6 +209,11 @@ func resourceRundeckJob() *schema.Resource {
 							Optional: true,
 						},
 
+						"type": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+
 						"default_value": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -656,6 +661,7 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 			option := JobOption{
 				Name:                    optionMap["name"].(string),
 				Label:                   optionMap["label"].(string),
+				Type:                    optionMap["type"].(string),
 				DefaultValue:            optionMap["default_value"].(string),
 				ValueChoices:            JobValueChoices([]string{}),
 				ValueChoicesURL:         optionMap["value_choices_url"].(string),
@@ -880,6 +886,7 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 			optionConfigI := map[string]interface{}{
 				"name":                      option.Name,
 				"label":                     option.Label,
+				"type":                      option.Type,
 				"default_value":             option.DefaultValue,
 				"value_choices":             option.ValueChoices,
 				"value_choices_url":         option.ValueChoicesURL,
