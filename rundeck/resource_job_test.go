@@ -245,6 +245,7 @@ resource "rundeck_job" "test" {
   option {
     name = "foo"
     default_value = "bar"
+    exposed_to_scripts = "false"
   }
   command {
     description = "Prints Hello World"
@@ -286,6 +287,7 @@ resource "rundeck_job" "test" {
   option {
     name = "foo"
     default_value = "bar"
+    exposed_to_scripts = "false"
   }
   command {
     job {
@@ -331,6 +333,7 @@ resource "rundeck_job" "test" {
     required = "true"
     value_choices = ["1","2","3","4","5","6","7","8","9"]
     require_predefined_choice = "true"
+    exposed_to_scripts = "false"
   }
 
   command {
