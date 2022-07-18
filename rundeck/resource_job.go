@@ -271,6 +271,7 @@ func resourceRundeckJob() *schema.Resource {
 						"exposed_to_scripts": {
 							Type:     schema.TypeBool,
 							Optional: true,
+							Default:  true,
 						},
 
 						"hidden": {

@@ -166,7 +166,7 @@ The following arguments are supported:
   requested value is a password, private key or any other secret value.
 
 * `exposed_to_scripts`: (Optional) Boolean controlling whether the value of this option is available
-  to scripts executed by job commands. Defaults to `false`.
+  to scripts executed by job commands. Defaults to `true`.
 
 `command` blocks must have any one of the following combinations of arguments as contents:
 
