@@ -487,6 +487,7 @@ resource "rundeck_job" "test" {
   option {
     name = "foo"
     type = "file"
+    exposed_to_scripts = "false"
   }
   command {
     description = "Prints Hello World"
@@ -517,6 +518,7 @@ resource "rundeck_job" "test" {
     name = "foo"
     default_value = "bar"
     hidden = true
+    exposed_to_scripts = "false"
   }
   command {
     description = "Prints Hello World"
