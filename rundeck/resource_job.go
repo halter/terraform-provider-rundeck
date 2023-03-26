@@ -687,6 +687,10 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 				option.IsHidden = strconv.FormatBool(hidden)
 			}
 
+			if option.ObscureInput == false && option.ValueIsExposedToScripts == false {
+				return nil, fmt.Errorf("exposed_to_scripts cannot be set to false when obscure_input is set to false")
+			}
+
 			for _, iv := range optionMap["value_choices"].([]interface{}) {
 				if iv == nil {
 					return nil, fmt.Errorf("argument \"value_choices\" can not have empty values; try \"required\"")
@@ -909,7 +913,6 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 				"allow_multiple_values":     option.AllowsMultipleValues,
 				"multi_value_delimiter":     option.MultiValueDelimiter,
 				"obscure_input":             option.ObscureInput,
-				"exposed_to_scripts":        option.ValueIsExposedToScripts,
 			}
 			if option.IsHidden != "" {
 				hidden, err := strconv.ParseBool(option.IsHidden)
@@ -920,6 +923,14 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 					optionConfigI["hidden"] = hidden
 				}
 			}
+
+			// exposed_to_scripts is always true if obscure_input is false
+			if option.ObscureInput {
+				optionConfigI["exposed_to_scripts"] = option.ValueIsExposedToScripts
+			} else {
+				optionConfigI["exposed_to_scripts"] = true
+			}
+
 			optionConfigsI = append(optionConfigsI, optionConfigI)
 		}
 	}
