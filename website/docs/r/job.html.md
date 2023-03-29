@@ -168,6 +168,9 @@ The following arguments are supported:
 * `exposed_to_scripts`: (Optional) Boolean controlling whether the value of this option is available
   to scripts executed by job commands. Defaults to `true`.
 
+* `default_tab`: (Optional)  Default tab to display when you follow an
+  execution. Defaults to `nodes`.
+
 `command` blocks must have any one of the following combinations of arguments as contents:
 
 * `description`: (Optional) gives a description to the command block.
