@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/rundeck/go-rundeck/rundeck"
 )
 
@@ -293,6 +294,13 @@ func resourceRundeckJob() *schema.Resource {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     resourceRundeckJobCommand(),
+			},
+
+			"default_tab": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "nodes",
+				ValidateFunc: validation.StringInSlice([]string{"nodes", "output", "html"}, false),
 			},
 		},
 	}
@@ -615,6 +623,7 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 			RankAttribute:           d.Get("rank_attribute").(string),
 			RankOrder:               d.Get("rank_order").(string),
 		},
+		DefaultTab: d.Get("default_tab").(string),
 	}
 
 	successOnEmpty := d.Get("success_on_empty_node_filter")
@@ -687,7 +696,7 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 				option.IsHidden = strconv.FormatBool(hidden)
 			}
 
-			if option.ObscureInput == false && option.ValueIsExposedToScripts == false {
+			if !option.ObscureInput && !option.ValueIsExposedToScripts {
 				return nil, fmt.Errorf("exposed_to_scripts cannot be set to false when obscure_input is set to false")
 			}
 
@@ -840,6 +849,9 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 		return err
 	}
 	if err := d.Set("retry", job.Retry); err != nil {
+		return err
+	}
+	if err := d.Set("default_tab", job.DefaultTab); err != nil {
 		return err
 	}
 
